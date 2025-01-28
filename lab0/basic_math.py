@@ -28,30 +28,38 @@ def functions(a_1, a_2):
     Необходимо найти точки экстремума функции и определить, есть ли у функций общие решения.
     Вернуть нужно координаты найденных решения списком, если они есть. None, если их бесконечно много.
     """
-    a_1 = list(map(float, a_1.split()))
-    a_2 = list(map(float, a_2.split()))
+    # Преобразуем строки в список чисел
+    coef1 = list(map(int, a_1.split()))
+    coef2 = list(map(int, a_2.split()))
 
-    def f(x):
-        return a_1[0] * x ** 2 + a_1[1] * x + a_1[2]
-
-    def p(x):
-        return a_2[0] * x ** 2 + a_2[1] * x + a_2[2]
-
-    res_f = minimize_scalar(f)
-    res_p = minimize_scalar(p)
-
-    solutions = []
-    to_inf = 0
-    for x in range(-100, 101):
-        if abs(f(x) - p(x)) < 1e-5:
-            solutions.append((x, f(x)))
-        to_inf += 1
-
-    if not solutions:
-        return []
-    if len(solutions) == to_inf:
+    if coef1 == coef2:
         return None
-    return solutions
+
+    def f(x, coef):
+        return coef[0] * x**2 + coef[1] * x + coef[2]
+
+    #extreme1 = -coef1[1] / (2 * coef1[0]) if coef1[0] != 0 else None
+    #extreme2 = -coef2[1] / (2 * coef2[0]) if coef2[0] != 0 else None
+
+    ans = []
+    if coef1[0] == coef2[0]:
+        if coef1[1] != coef2[1]:
+            x = (coef2[2] - coef1[2]) / (coef1[1] - coef2[1])
+            ans.append((x, f(x, coef1)))
+    else:
+        a = coef1[0] - coef2[0]
+        b = coef1[1] - coef2[1]
+        c = coef1[2] - coef2[2]
+        det = b ** 2 - 4 * a * c
+        if det >= 0:
+            x1 = (-b + (det) ** 0.5) / (2 * a)
+            x2 = (-b - (det) ** 0.5) / (2 * a)
+            ans.append((x1, f(x1, coef1)))
+            if x1 != x2:
+                ans.append((x2, f(x2, coef1)))
+
+    return ans
+
 
 
 
